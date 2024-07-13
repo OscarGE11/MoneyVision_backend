@@ -1,7 +1,23 @@
-import express from "express";
+import express from 'express';
+import connectDB from './database.js';
+import config from './src/config/config.js';
 
 const app = express();
+const PORT = config.port;
 
-app.listen(3000);
+// Middleware para parsear JSON
+app.use(express.json());
 
-console.log("Server listening on port 3000");
+// Conectar a la base de datos
+connectDB();
+
+// Middleware para manejar errores
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
+});
+
+// Iniciar el servidor
+app.listen(PORT, () => {
+  console.log('Server listening on port:', PORT);
+});
