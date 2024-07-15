@@ -1,5 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 
+const typeOfMovementEnum = ['expense', 'income'];
+
 const movementSchema = new mongoose.Schema(
   {
     title: {
@@ -15,6 +17,7 @@ const movementSchema = new mongoose.Schema(
     },
     typeOfMovement: {
       type: String,
+      enum: typeOfMovementEnum,
       required: true,
     },
     category: {
@@ -32,10 +35,10 @@ export const MovementModel = mongoose.model('Movement', movementSchema);
 
 export const createMovement = async () => {
   const movement = new MovementModel({
-    title: 'Paga la coca',
-    description: 'paga',
+    title: 'cena Vips',
+    description: 'cena vips en parque sur el martes',
     amount: 1000,
-    typeOfMovement: 'hola',
+    typeOfMovement: 'expense',
     category: '66953094a13623ccfcd0b6eb',
   });
   const result = await movement.save();
