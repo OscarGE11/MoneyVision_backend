@@ -1,17 +1,37 @@
 import mongoose from 'mongoose';
+import { Schema } from 'mongoose';
 
 const userSchema = mongoose.Schema(
   {
-    name: String,
-    username: String,
-    email: String,
-    password: String,
-    money: Number,
+    name: {
+      type: String,
+      required: true,
+    },
+    username: {
+      type: String,
+      required: true,
+    },
+    email: {
+      type: String,
+      required: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
+    money: {
+      type: Number,
+      required: true,
+    },
+    movements: {
+      type: Schema.Types.ObjectId,
+      ref: 'Movements',
+    },
   },
-  { versionKey: false }
+  { versionKey: false, timestamps: true }
 );
 
-const UserModel = mongoose.model('users', userSchema);
+const UserModel = mongoose.model('User', userSchema);
 
 export const showUsers = async () => {
   const users = await UserModel.find();
