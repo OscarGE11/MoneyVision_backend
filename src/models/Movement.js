@@ -1,4 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
+import { TYPE_OF_MOVEMENT_ENUM } from '../utils/ENUMS.js';
 
 const movementSchema = new mongoose.Schema(
   {
@@ -15,7 +16,7 @@ const movementSchema = new mongoose.Schema(
     },
     typeOfMovement: {
       type: String,
-      enum: ['expense', 'income'],
+      enum: TYPE_OF_MOVEMENT_ENUM,
       required: true,
     },
     category: {
