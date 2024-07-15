@@ -1,6 +1,7 @@
 import express from 'express';
 import connectDB from './database.js';
 import config from './src/config/config.js';
+import userRouter from './src/routes/user.routes.js';
 
 const app = express();
 const PORT = config.port;
@@ -10,6 +11,9 @@ app.use(express.json());
 
 // Conectar a la base de datos
 connectDB();
+
+// Routes
+app.use('/api/users', userRouter);
 
 // Middleware para manejar errores
 app.use((err, req, res, next) => {
