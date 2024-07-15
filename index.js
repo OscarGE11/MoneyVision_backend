@@ -8,10 +8,9 @@ import userRouter from './src/routes/user.routes.js';
 const app = express();
 const PORT = config.port;
 
-// Middleware para parsear JSON
-app.use(express.json());
-// Middleware para rastrear las peticiones HTTP
-app.use(morgan('dev'));
+// Middlewares
+app.use(express.json()); // Parsear JSON
+app.use(morgan('dev')); // Rastrear las peticiones HTTP
 
 // Conectar a la base de datos
 connectDB();
