@@ -5,10 +5,10 @@ const categorySchema = mongoose.Schema(
     name: String,
     description: String,
   },
-  { versionKey: false }
+  { versionKey: false, timestamps: true }
 );
 
-const CategoryModel = mongoose.model('categories', categorySchema);
+const CategoryModel = mongoose.model('Category', categorySchema);
 
 export const showCategories = async () => {
   const category = await CategoryModel.find();
