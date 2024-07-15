@@ -1,6 +1,7 @@
 import express from 'express';
 import connectDB from './database.js';
 import config from './src/config/config.js';
+import { createMovement } from './src/models/Movement.js';
 
 const app = express();
 const PORT = config.port;

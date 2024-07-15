@@ -1,7 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
 
-const typeOfMovementEnum = ['expense', 'income'];
-
 const movementSchema = new mongoose.Schema(
   {
     title: {
@@ -17,7 +15,7 @@ const movementSchema = new mongoose.Schema(
     },
     typeOfMovement: {
       type: String,
-      enum: typeOfMovementEnum,
+      enum: ['expense', 'income'],
       required: true,
     },
     category: {
