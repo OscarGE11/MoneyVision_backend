@@ -1,5 +1,4 @@
-import mongoose from 'mongoose';
-import { Schema } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 
 const userSchema = mongoose.Schema(
   {
@@ -31,21 +30,4 @@ const userSchema = mongoose.Schema(
   { versionKey: false, timestamps: true }
 );
 
-const UserModel = mongoose.model('User', userSchema);
-
-export const showUsers = async () => {
-  const users = await UserModel.find();
-  console.log(users);
-};
-
-export const createUser = async () => {
-  const user = new UserModel({
-    name: 'Oscar',
-    username: 'Osquital',
-    email: 'oscar@gmail.com',
-    password: 'hola',
-    money: 20000,
-  });
-  const result = await user.save();
-  console.log(result);
-};
+export const UserModel = mongoose.model('User', userSchema);
