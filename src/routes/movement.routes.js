@@ -1,10 +1,12 @@
 import { Router } from 'express';
-import { createMovement } from '../controllers/movementController.js';
-import { showMovements } from '../models/Movement.js';
+import {
+  createMovement,
+  getAllMovements,
+} from '../controllers/movementController.js';
 
 const movementRouter = Router();
 
 movementRouter.post('/', createMovement);
-movementRouter.get('/', showMovements);
+movementRouter.get('/', getAllMovements);
 
 export default movementRouter;
