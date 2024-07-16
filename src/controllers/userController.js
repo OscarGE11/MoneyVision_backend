@@ -46,3 +46,34 @@ export const getUserById = async (req, res) => {
     res.status(500).json({ message: 'Error getting the user:', error });
   }
 };
+
+// Update a user's data
+export const updateUser = async (req, res) => {
+  try {
+    const updatedUser = await UserModel.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      {
+        new: true,
+      }
+    );
+    
+    if (!updatedUser) {
+      res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(202).json(updatedUser);
+  } catch (err) {
+    res.status(500).json({ message: 'Error updating the user' });
+  }
+};
+
+// Delete a user by ID
+export const deleteUser = async (req, res) => {
+  try {
+    await UserModel.findByIdAndDelete(req.params.id);
+    res.status(204).json({ message: 'User deleted' });
+  } catch (err) {
+    res.status(500).json({ message: 'Error deleting the user' });
+  }
+};
