@@ -2,7 +2,8 @@ import { UserModel } from '../models/User.js';
 
 // Create new user
 export const createUser = async (req, res) => {
-  const { name, username, email, password, money, movements } = req.body;
+  const { name, username, email, password, money /* To-Do movements ref*/ } =
+    req.body;
 
   try {
     const newUser = new UserModel({
@@ -57,7 +58,7 @@ export const updateUser = async (req, res) => {
         new: true,
       }
     );
-    
+
     if (!updatedUser) {
       res.status(404).json({ message: 'User not found' });
     }
@@ -71,7 +72,12 @@ export const updateUser = async (req, res) => {
 // Delete a user by ID
 export const deleteUser = async (req, res) => {
   try {
-    await UserModel.findByIdAndDelete(req.params.id);
+    const deletedUser = await UserModel.findByIdAndDelete(req.params.id);
+
+    if (!deletedUser) {
+      res.status(404).json({ message: 'User not found' });
+    }
+
     res.status(204).json({ message: 'User deleted' });
   } catch (err) {
     res.status(500).json({ message: 'Error deleting the user' });

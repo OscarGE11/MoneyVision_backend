@@ -1,9 +1,10 @@
 import express from 'express';
 import connectDB from './database.js';
 import config from './src/config/config.js';
-import movementRouter from './src/routes/movement.routes.js';
+import transactionRouter from './src/routes/transaction.routes.js';
 import morgan from 'morgan';
 import userRouter from './src/routes/user.routes.js';
+import categoryRouter from './src/routes/category.routes.js';
 
 const app = express();
 const PORT = config.port;
@@ -17,7 +18,8 @@ connectDB();
 
 // Routes
 app.use('/api/users', userRouter);
-app.use('/api/movements', movementRouter);
+app.use('/api/transactions', transactionRouter);
+app.use('/api/categories', categoryRouter);
 
 // Middleware para manejar errores
 app.use((err, req, res, next) => {
