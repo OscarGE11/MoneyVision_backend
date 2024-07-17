@@ -22,9 +22,9 @@ const userSchema = mongoose.Schema(
       type: Number,
       required: true,
     },
-    movements: {
+    transactions: {
       type: Schema.Types.ObjectId,
-      ref: 'Movements',
+      ref: 'Transaction',
     },
   },
   { versionKey: false, timestamps: true }
