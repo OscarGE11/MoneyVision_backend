@@ -1,5 +1,5 @@
 import express from 'express';
-import connectDB from './database.js';
+import connectDB from './src/utils/database.js';
 import config from './src/config/config.js';
 import transactionRouter from './src/routes/transaction.routes.js';
 import morgan from 'morgan';
@@ -26,9 +26,6 @@ app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).send('Something broke!');
 });
-
-// Conectar a la base de datos
-connectDB();
 
 // Iniciar el servidor
 app.listen(PORT, () => {
