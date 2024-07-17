@@ -5,7 +5,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "node --watch index.js"
+    "dev": "node --watch index.js",
+    "lint": "eslint '**/*.js'",
+    "format": "prettier --write '**/*.js'"
   },
   "keywords": [],
   "author": "",
