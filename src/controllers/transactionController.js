@@ -15,8 +15,8 @@ export const createTransaction = async (req, res) => {
 
     await newTransaction.save()
     res.status(201).json(newTransaction)
-  } catch (err) {
-    res.status(500).json({ message: 'Error creating the Transaction', err })
+  } catch (error) {
+    res.status(500).json({ message: 'Error creating the Transaction' })
   }
 }
 
@@ -28,13 +28,12 @@ export const getAllTransactions = async (req, res) => {
       'name'
     )
     res.status(200).json(transactions)
-  } catch (err) {
-    res.status(500).json({ message: 'Error getting the transactions', err })
+  } catch (error) {
+    res.status(500).json({ message: 'Error getting the transactions' })
   }
 }
 
 // Function for getting one Transaction
-
 export const getTransactionByID = async (req, res) => {
   try {
     const transaction = await TransactionModel.findById(req.params.id).populate(
@@ -48,29 +47,31 @@ export const getTransactionByID = async (req, res) => {
       })
     }
     res.status(200).json(transaction)
-  } catch (err) {
-    res.status(500).json({ message: 'Error getting the transaction', err })
+  } catch (error) {
+    res.status(500).json({ message: 'Error getting the transaction' })
   }
 }
 
+// Update transaction's data
 export const updateTransaction = async (req, res) => {
   try {
-    const transactionUpdate = await TransactionModel.findByIdAndUpdate(
+    const updatedTransaction = await TransactionModel.findByIdAndUpdate(
       req.params.id,
       req.body,
       {
         new: true
       }
     )
-    if (!transactionUpdate) {
+    if (!updatedTransaction) {
       res.status(404).json({ message: 'Transaction not found' })
     }
-    res.status(202).json(transactionUpdate)
-  } catch (err) {
+    res.status(202).json(updatedTransaction)
+  } catch (error) {
     res.status(500).json({ message: 'Error updating the transaction' })
   }
 }
 
+// Delete a transaction by ID
 export const deleteTransaction = async (req, res) => {
   try {
     const deletedTransaction = await TransactionModel.findByIdAndDelete(
@@ -82,9 +83,7 @@ export const deleteTransaction = async (req, res) => {
     }
 
     res.status(204).json({ message: 'Transaction deleted' })
-  } catch (err) {
-    res
-      .status(500)
-      .json({ message: 'Error deleting the transaction', error: err.message })
+  } catch (error) {
+    res.status(500).json({ message: 'Error deleting the transaction' })
   }
 }
