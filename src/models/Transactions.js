@@ -1,7 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
-import { TYPE_OF_MOVEMENT_ENUM } from '../utils/ENUMS.js';
+import { TYPE_OF_TRANSACTION_ENUM } from '../utils/ENUMS.js';
 
-const movementSchema = new mongoose.Schema(
+const transactionSchema = new mongoose.Schema(
   {
     title: {
       type: String,
@@ -14,9 +14,9 @@ const movementSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    typeOfMovement: {
+    typeOfTransaction: {
       type: String,
-      enum: TYPE_OF_MOVEMENT_ENUM,
+      enum: TYPE_OF_TRANSACTION_ENUM,
       required: true,
     },
     category: {
@@ -30,4 +30,7 @@ const movementSchema = new mongoose.Schema(
   }
 );
 
-export const MovementModel = mongoose.model('Movement', movementSchema);
+export const TransactionModel = mongoose.model(
+  'Transaction',
+  transactionSchema
+);
