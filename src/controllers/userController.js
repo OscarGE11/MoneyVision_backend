@@ -2,8 +2,7 @@ import { UserModel } from '../models/User.js'
 
 // Create new user
 export const createUser = async (req, res) => {
-  const { name, username, email, password, money /* To-Do movements ref */ } =
-    req.body
+  const { name, username, email, password, money } = req.body
 
   try {
     const newUser = new UserModel({
@@ -16,17 +15,17 @@ export const createUser = async (req, res) => {
     await newUser.save()
     res.status(201).json(newUser)
   } catch (error) {
-    res.status(500).json({ message: 'Error creating the user:', error })
+    res.status(500).json({ message: 'Error creating the user:' })
   }
 }
 
 // Get all users
 export const getUsers = async (req, res) => {
   try {
-    const users = await UserModel.find().populate('movements', 'title')
+    const users = await UserModel.find().populate('transactions', 'title')
     res.status(200).json(users)
   } catch (error) {
-    res.status(500).json({ message: 'Error getting all users:', error })
+    res.status(500).json({ message: 'Error getting all users:' })
   }
 }
 
@@ -44,18 +43,18 @@ export const getUserById = async (req, res) => {
 
     res.status(200).json(user)
   } catch (error) {
-    res.status(500).json({ message: 'Error getting the user:', error })
+    res.status(500).json({ message: 'Error getting the user:' })
   }
 }
 
-// Update a user's data
+// Update user's data
 export const updateUser = async (req, res) => {
   try {
     const updatedUser = await UserModel.findByIdAndUpdate(
       req.params.id,
       req.body,
       {
-        new: true
+        new: true // returns the updated user
       }
     )
 
@@ -64,7 +63,7 @@ export const updateUser = async (req, res) => {
     }
 
     res.status(202).json(updatedUser)
-  } catch (err) {
+  } catch (error) {
     res.status(500).json({ message: 'Error updating the user' })
   }
 }
@@ -79,7 +78,7 @@ export const deleteUser = async (req, res) => {
     }
 
     res.status(204).json({ message: 'User deleted' })
-  } catch (err) {
+  } catch (error) {
     res.status(500).json({ message: 'Error deleting the user' })
   }
 }
