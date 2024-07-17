@@ -1,36 +1,33 @@
-import mongoose, { Schema } from 'mongoose';
-import { TYPE_OF_TRANSACTION_ENUM } from '../utils/ENUMS.js';
+import mongoose, { Schema } from 'mongoose'
+import { TYPE_OF_TRANSACTION_ENUM } from '../utils/ENUMS.js'
 
 const transactionSchema = new mongoose.Schema(
   {
     title: {
       type: String,
-      required: true,
+      required: true
     },
     description: {
-      type: String,
+      type: String
     },
     amount: {
       type: Number,
-      required: true,
+      required: true
     },
     typeOfTransaction: {
       type: String,
       enum: TYPE_OF_TRANSACTION_ENUM,
-      required: true,
+      required: true
     },
     category: {
       type: Schema.Types.ObjectId,
-      ref: 'Category',
-    },
+      ref: 'Category'
+    }
   },
   {
     timestamps: true,
-    versionKey: false,
+    versionKey: false
   }
-);
+)
 
-export const TransactionModel = mongoose.model(
-  'Transaction',
-  transactionSchema
-);
+export const TransactionModel = mongoose.model('Transaction', transactionSchema)

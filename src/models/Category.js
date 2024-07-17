@@ -1,11 +1,11 @@
-import mongoose from 'mongoose';
+import mongoose from 'mongoose'
 
 const categorySchema = mongoose.Schema(
   {
     name: String,
-    description: String,
+    description: String
   },
   { versionKey: false, timestamps: true }
-);
+)
 
-export const CategoryModel = mongoose.model('Category', categorySchema);
+export const CategoryModel = mongoose.model('Category', categorySchema)
