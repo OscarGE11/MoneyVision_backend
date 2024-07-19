@@ -33,7 +33,7 @@ export const userSchema = Joi.object({
   /* The ID of the object transaction, is optional because it is possible
    that an user has not transactions when created. */
 
-  transactionSchema: Joi.string()
+  transaction: Joi.string()
     .pattern(/^[0-9a-fA-F]{24}$/, 'Invalid ObjectId format')
     .optional()
 })
