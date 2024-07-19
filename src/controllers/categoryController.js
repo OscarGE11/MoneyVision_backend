@@ -1,17 +1,31 @@
 import { CategoryModel } from '../models/Category.js'
+import {
+  categorySchema as categoryValidationSchema,
+  idSchema
+} from '../utils/validation.js'
 
 // Function for creating a new category
 export const createCategory = async (req, res) => {
-  const { name, description } = req.body
+  const { error, value } = categoryValidationSchema.validate(req.body)
+
+  if (error) {
+    return res
+      .status(400)
+      .json({ message: 'Validation error', errs: error.details })
+  }
 
   try {
-    const newCategory = new CategoryModel({
-      name,
-      description
-    })
+    const newCategory = new CategoryModel(value)
     await newCategory.save()
     res.status(201).json(newCategory)
   } catch (err) {
+    /* 11000 is the code that MongoDB throws when a key value is duplicated
+    and is defined as unique. */
+
+    if (err.code === 11000) {
+      const duplicateCategory = Object.keys(err.keyValue)[0]
+      res.status(409).json({ message: `${duplicateCategory} already exists` })
+    }
     res.status(500).json({ message: 'Error creating category', error: err })
   }
 }
@@ -27,6 +41,14 @@ export const getAllCategories = async (req, res) => {
 }
 
 export const getCategoryById = async (req, res) => {
+  const { error } = idSchema.validate(req.params)
+
+  if (error) {
+    return res
+      .status(400)
+      .json({ message: 'Invalid ID format', errors: error.details })
+  }
+
   try {
     const category = await CategoryModel.findById(req.params.id)
 
@@ -35,11 +57,18 @@ export const getCategoryById = async (req, res) => {
     }
     res.status(200).json(category)
   } catch (err) {
-    res.status(500).json({ message: 'Error getting the category', err: err })
+    res.status(500).json({ message: 'Error getting the category' })
   }
 }
 
 export const deleteCategory = async (req, res) => {
+  const { error } = idSchema.validate(req.params)
+
+  if (error) {
+    return res
+      .status(400)
+      .json({ message: 'Invalid ID format', errors: error.details })
+  }
   try {
     const deletedCategory = await CategoryModel.findByIdAndDelete(req.params.id)
 
@@ -56,11 +85,31 @@ export const deleteCategory = async (req, res) => {
 }
 
 export const updateCategory = async (req, res) => {
+  const { error: idError } = idSchema.validate({ id: req.params.id })
+
+  if (idError) {
+    return res
+      .status(400)
+      .json({ message: 'Invalid ID format', errors: idError.details })
+  }
+
+  const { error: bodyError, value } = categoryValidationSchema.validate(
+    req.body
+  )
+
+  if (bodyError) {
+    return res
+      .status(400)
+      .json({ message: 'Validation error', errors: bodyError.details })
+  }
+
   try {
     const updateCategory = await CategoryModel.findByIdAndUpdate(
       req.params.id,
-      req.body,
-      { new: true }
+      value,
+      {
+        new: true
+      }
     )
 
     if (!updateCategory) {

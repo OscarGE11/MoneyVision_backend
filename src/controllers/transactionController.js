@@ -1,21 +1,32 @@
 import { TransactionModel } from '../models/Transactions.js'
+import {
+  idSchema,
+  transactionSchema as transactionValidationSchema
+} from '../utils/validation.js'
 
 // Function for creating a Transaction
 export const createTransaction = async (req, res) => {
-  const { title, description, amount, typeOfTransaction } = req.body
+  const { error, value } = transactionValidationSchema.validate(req.body)
+
+  if (error) {
+    return res
+      .status(400)
+      .json({ message: 'Validation error', error: error.details })
+  }
 
   try {
-    const newTransaction = new TransactionModel({
-      title,
-      description,
-      amount,
-      typeOfTransaction
-      // category: req.category.id,
-    })
+    const newTransaction = new TransactionModel(value)
 
     await newTransaction.save()
     res.status(201).json(newTransaction)
   } catch (error) {
+    /* 11000 is the code that MongoDB throws when a key value is duplicated
+    and is defined as unique. */
+
+    if (error.code === 11000) {
+      const duplicateCategory = Object.keys(error.keyValue)[0]
+      res.status(409).json({ message: `${duplicateCategory} already exists` })
+    }
     res.status(500).json({ message: 'Error creating the Transaction' })
   }
 }
@@ -35,6 +46,14 @@ export const getAllTransactions = async (req, res) => {
 
 // Function for getting one Transaction
 export const getTransactionByID = async (req, res) => {
+  const { error } = idSchema.validate(req.params)
+
+  if (error) {
+    return res
+      .status(400)
+      .json({ message: 'Invalid ID format', errors: error.details })
+  }
+
   try {
     const transaction = await TransactionModel.findById(req.params.id).populate(
       'category',
@@ -54,10 +73,28 @@ export const getTransactionByID = async (req, res) => {
 
 // Update transaction's data
 export const updateTransaction = async (req, res) => {
+  const { error: idError } = idSchema.validate({ id: req.params.id })
+
+  if (idError) {
+    return res
+      .status(400)
+      .json({ message: 'Invalid ID format', errors: idError.details })
+  }
+
+  const { error: bodyError, value } = transactionValidationSchema.validate(
+    req.body
+  )
+
+  if (bodyError) {
+    return res
+      .status(400)
+      .json({ message: 'Validation error', errors: bodyError.details })
+  }
+
   try {
     const updatedTransaction = await TransactionModel.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      value,
       {
         new: true
       }
@@ -73,6 +110,13 @@ export const updateTransaction = async (req, res) => {
 
 // Delete a transaction by ID
 export const deleteTransaction = async (req, res) => {
+  const { error } = idSchema.validate(req.params)
+
+  if (error) {
+    return res
+      .status(400)
+      .json({ message: 'Invalid ID format', errors: error.details })
+  }
   try {
     const deletedTransaction = await TransactionModel.findByIdAndDelete(
       req.params.id
