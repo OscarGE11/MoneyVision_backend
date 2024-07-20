@@ -17,7 +17,7 @@ export const createCategory = async (req, res) => {
     await newCategory.save()
     res.status(201).json(newCategory)
   } catch (err) {
-    // 1100 = MongoDB error if unique key value is duplicated
+    // 11000 = MongoDB error if unique key value is duplicated
     if (err.code === 11000) {
       const duplicateCategory = Object.keys(err.keyValue)[0]
       res.status(409).json({ message: `${duplicateCategory} already exists` })
