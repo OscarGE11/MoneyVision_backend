@@ -18,7 +18,7 @@ export const createTransaction = async (req, res) => {
     await newTransaction.save()
     res.status(201).json(newTransaction)
   } catch (error) {
-    // 1100 = MongoDB error if unique key value is duplicated
+    // 11000 = MongoDB error if unique key value is duplicated
     if (error.code === 11000) {
       const duplicatedKey = Object.keys(error.keyValue)[0]
       res.status(409).json({ message: `${duplicatedKey} already exists` })
