@@ -1,5 +1,6 @@
 import { UserModel } from '../models/User.js'
 import { userSchema as userValidationschema } from '../validations/userValidationSchema.js'
+import bcrypt from 'bcrypt'
 
 // Create new user
 export const createUser = async (req, res) => {
@@ -13,6 +14,10 @@ export const createUser = async (req, res) => {
   }
 
   try {
+    // Hashing the password
+    const salt = await bcrypt.genSalt(10)
+    value.password = await bcrypt.hash(value.password, salt)
+
     const newUser = new UserModel(value)
     await newUser.save()
     res.status(201).json(newUser)
