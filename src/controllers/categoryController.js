@@ -1,17 +1,15 @@
 import { CategoryModel } from '../models/Category.js'
-import {
-  categorySchema as categoryValidationSchema,
-  idSchema
-} from '../utils/validation.js'
+import { categorySchema as categoryValidationSchema } from '../validations/categoryValidationSchema.js'
 
 // Function for creating a new category
 export const createCategory = async (req, res) => {
   const { error, value } = categoryValidationSchema.validate(req.body)
 
   if (error) {
-    return res
-      .status(400)
-      .json({ message: 'Validation error', errs: error.details })
+    return res.status(400).json({
+      message: 'Validation error',
+      error: error.details.map((detail) => detail.message)
+    })
   }
 
   try {
@@ -19,14 +17,12 @@ export const createCategory = async (req, res) => {
     await newCategory.save()
     res.status(201).json(newCategory)
   } catch (err) {
-    /* 11000 is the code that MongoDB throws when a key value is duplicated
-    and is defined as unique. */
-
+    // 11000 = MongoDB error if unique key value is duplicated
     if (err.code === 11000) {
       const duplicateCategory = Object.keys(err.keyValue)[0]
       res.status(409).json({ message: `${duplicateCategory} already exists` })
     }
-    res.status(500).json({ message: 'Error creating category', error: err })
+    res.status(500).json({ message: 'Error creating category' })
   }
 }
 
@@ -36,19 +32,11 @@ export const getAllCategories = async (req, res) => {
     const categories = await CategoryModel.find()
     res.status(200).json(categories)
   } catch (err) {
-    res.status(500).json({ message: 'Error getting categories', error: err })
+    res.status(500).json({ message: 'Error getting categories' })
   }
 }
 
 export const getCategoryById = async (req, res) => {
-  const { error } = idSchema.validate(req.params)
-
-  if (error) {
-    return res
-      .status(400)
-      .json({ message: 'Invalid ID format', errors: error.details })
-  }
-
   try {
     const category = await CategoryModel.findById(req.params.id)
 
@@ -62,13 +50,6 @@ export const getCategoryById = async (req, res) => {
 }
 
 export const deleteCategory = async (req, res) => {
-  const { error } = idSchema.validate(req.params)
-
-  if (error) {
-    return res
-      .status(400)
-      .json({ message: 'Invalid ID format', errors: error.details })
-  }
   try {
     const deletedCategory = await CategoryModel.findByIdAndDelete(req.params.id)
 
@@ -80,27 +61,18 @@ export const deleteCategory = async (req, res) => {
       message: 'Category deleted successfully'
     })
   } catch (err) {
-    res.status(500).json({ message: 'Error deleting the category', err })
+    res.status(500).json({ message: 'Error deleting the category' })
   }
 }
 
 export const updateCategory = async (req, res) => {
-  const { error: idError } = idSchema.validate({ id: req.params.id })
+  const { error, value } = categoryValidationSchema.validate(req.body)
 
-  if (idError) {
-    return res
-      .status(400)
-      .json({ message: 'Invalid ID format', errors: idError.details })
-  }
-
-  const { error: bodyError, value } = categoryValidationSchema.validate(
-    req.body
-  )
-
-  if (bodyError) {
-    return res
-      .status(400)
-      .json({ message: 'Validation error', errors: bodyError.details })
+  if (error) {
+    return res.status(400).json({
+      message: 'Validation error',
+      error: error.details.map((detail) => detail.message)
+    })
   }
 
   try {
@@ -118,6 +90,6 @@ export const updateCategory = async (req, res) => {
 
     res.status(200).json(updateCategory)
   } catch (err) {
-    res.status(500).json({ message: 'Error updating the category', err })
+    res.status(500).json({ message: 'Error updating the category' })
   }
 }
