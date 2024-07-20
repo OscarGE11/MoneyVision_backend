@@ -1,18 +1,15 @@
 import { UserModel } from '../models/User.js'
-import {
-  idSchema,
-  userSchema,
-  userSchema as userValidationschema
-} from '../utils/validation.js'
+import { userSchema as userValidationschema } from '../validations/userValidationSchema.js'
 
 // Create new user
 export const createUser = async (req, res) => {
   const { error, value } = userValidationschema.validate(req.body)
 
   if (error) {
-    return res
-      .status(400)
-      .json({ message: 'Validation error', errs: error.details })
+    return res.status(400).json({
+      message: 'Validation error',
+      error: error.details.map((detail) => detail.message)
+    })
   }
 
   try {
@@ -20,14 +17,12 @@ export const createUser = async (req, res) => {
     await newUser.save()
     res.status(201).json(newUser)
   } catch (error) {
-    /* 11000 is the code that MongoDB throws when a key value is duplicated
-    and is defined as unique. */
-
+    // 1100 = MongoDB error if unique key value is duplicated
     if (error.code === 11000) {
-      const duplicateCategory = Object.keys(error.keyValue)[0]
-      res.status(409).json({ message: `${duplicateCategory} already exists` })
+      const duplicatedKey = Object.keys(error.keyValue)[0]
+      res.status(409).json({ message: `${duplicatedKey} already exists` })
     }
-    res.status(500).json({ message: 'Error creating the user:' })
+    res.status(500).json({ message: 'Error creating the user' })
   }
 }
 
@@ -37,20 +32,12 @@ export const getUsers = async (req, res) => {
     const users = await UserModel.find().populate('transactions', 'title')
     res.status(200).json(users)
   } catch (error) {
-    res.status(500).json({ message: 'Error getting all users:' })
+    res.status(500).json({ message: 'Error getting all users' })
   }
 }
 
 // Get user by ID
 export const getUserById = async (req, res) => {
-  const { error } = idSchema.validate(req.params)
-
-  if (error) {
-    return res
-      .status(400)
-      .json({ message: 'Invalid ID format', errors: error.details })
-  }
-
   try {
     const user = await UserModel.findById(req.params.id).populate(
       'transactions',
@@ -63,26 +50,19 @@ export const getUserById = async (req, res) => {
 
     res.status(200).json(user)
   } catch (error) {
-    res.status(500).json({ message: 'Error getting the user:' })
+    res.status(500).json({ message: 'Error getting the user' })
   }
 }
 
 // Update user's data
 export const updateUser = async (req, res) => {
-  const { error: idError } = idSchema.validate({ id: req.params.id })
+  const { error, value } = await userValidationschema.validateAsync(req.body)
 
-  if (idError) {
-    return res
-      .status(400)
-      .json({ message: 'Invalid ID format', errors: idError.details })
-  }
-
-  const { error: bodyError, value } = userSchema.validate(req.body)
-
-  if (bodyError) {
-    return res
-      .status(400)
-      .json({ message: 'Invalid body format', errors: bodyError.details })
+  if (error) {
+    return res.status(400).json({
+      message: 'Validation error',
+      error: error.details.map((detail) => detail.message)
+    })
   }
 
   try {
@@ -106,14 +86,6 @@ export const updateUser = async (req, res) => {
 
 // Delete a user by ID
 export const deleteUser = async (req, res) => {
-  const { error } = idSchema.validate(req.params)
-
-  if (error) {
-    return res
-      .status(400)
-      .json({ message: 'Invalid ID format', errors: error.details })
-  }
-
   try {
     const deletedUser = await UserModel.findByIdAndDelete(req.params.id)
 
