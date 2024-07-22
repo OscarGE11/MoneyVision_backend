@@ -20,7 +20,9 @@ export const createUser = async (req, res) => {
 
     const newUser = new UserModel(value)
     await newUser.save()
-    res.status(201).json(newUser)
+    res
+      .status(201)
+      .json({ message: 'User created Succesfully', username: newUser.username })
   } catch (error) {
     // 11000 = MongoDB error if unique key value is duplicated
     if (error.code === 11000) {
@@ -83,7 +85,12 @@ export const updateUser = async (req, res) => {
       res.status(404).json({ message: 'User not found' })
     }
 
-    res.status(202).json(updatedUser)
+    res
+      .status(202)
+      .json({
+        message: 'User updated Succesfully',
+        username: updatedUser.username
+      })
   } catch (error) {
     res.status(500).json({ message: 'Error updating the user' })
   }
