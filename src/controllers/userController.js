@@ -52,10 +52,13 @@ export const getUsers = async (req, res) => {
 // Get user by ID
 export const getUserById = async (req, res) => {
   try {
-    const user = await UserModel.findById(req.params.id).populate(
-      'transactions',
-      'title'
-    )
+    const user = await UserModel.findById(req.params.id).populate({
+      path: 'transactions',
+      populate: {
+        path: 'category',
+        select: 'name'
+      }
+    })
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' })
@@ -91,12 +94,10 @@ export const updateUser = async (req, res) => {
       res.status(404).json({ message: 'User not found' })
     }
 
-    res
-      .status(202)
-      .json({
-        message: 'User updated Succesfully',
-        username: updatedUser.username
-      })
+    res.status(202).json({
+      message: 'User updated Succesfully',
+      username: updatedUser.username
+    })
   } catch (error) {
     res.status(500).json({ message: 'Error updating the user' })
   }

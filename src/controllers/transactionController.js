@@ -30,7 +30,7 @@ export const createTransaction = async (req, res) => {
     const newTransaction = new TransactionModel(value)
     const savedTransaction = await newTransaction.save()
 
-    user.transactions.push(savedTransaction._id) // Add transaction to user 
+    user.transactions.push(savedTransaction._id) // Add transaction to user
     await user.save()
 
     res.status(201).json(newTransaction)
