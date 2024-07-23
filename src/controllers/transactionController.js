@@ -1,5 +1,6 @@
 import { TransactionModel } from '../models/Transactions.js'
 import { transactionSchema as transactionValidationSchema } from '../validations/transactionValidationSchema.js'
+import { UserModel } from '../models/User.js'
 
 // Function for creating a Transaction
 export const createTransaction = async (req, res) => {
@@ -15,7 +16,17 @@ export const createTransaction = async (req, res) => {
   try {
     const newTransaction = new TransactionModel(value)
 
-    await newTransaction.save()
+    const savedTransaction = await newTransaction.save()
+
+    // Look for the user which is the owner of the transaction
+    const user = await UserModel.findById(value.user)
+
+    // If exists, add the transaction to the user's transactions array
+    if (user) {
+      user.transactions.push(savedTransaction._id)
+      await user.save()
+    }
+
     res.status(201).json(newTransaction)
   } catch (error) {
     // 11000 = MongoDB error if unique key value is duplicated
@@ -30,10 +41,9 @@ export const createTransaction = async (req, res) => {
 // Function for getting all the Transactions
 export const getAllTransactions = async (req, res) => {
   try {
-    const transactions = await TransactionModel.find().populate(
-      'category',
-      'name'
-    )
+    const transactions = await TransactionModel.find()
+      .populate('category', 'name')
+      .populate('user', 'name')
     res.status(200).json(transactions)
   } catch (error) {
     res.status(500).json({ message: 'Error getting the transactions' })
@@ -43,10 +53,9 @@ export const getAllTransactions = async (req, res) => {
 // Function for getting one Transaction
 export const getTransactionByID = async (req, res) => {
   try {
-    const transaction = await TransactionModel.findById(req.params.id).populate(
-      'category',
-      'name'
-    )
+    const transaction = await TransactionModel.findById(req.params.id)
+      .populate('category', 'name')
+      .populate('user', 'name')
 
     if (!transaction) {
       return res.status(404).json({

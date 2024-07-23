@@ -28,5 +28,9 @@ export const transactionSchema = Joi.object({
   category: Joi.string().required().messages({
     'string.base': 'Category should be a type of text',
     'any.required': 'Category ID is required'
+  }),
+  user: Joi.string().required().messages({
+    'string.base': 'User should be a type of text',
+    'any.required': 'User ID is required'
   })
 }).strict()

@@ -24,10 +24,12 @@ const userSchema = mongoose.Schema(
       type: Number,
       required: true
     },
-    transactions: {
-      type: Schema.Types.ObjectId,
-      ref: 'Transaction'
-    }
+    transactions: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Transaction'
+      }
+    ]
   },
   { versionKey: false, timestamps: true }
 )

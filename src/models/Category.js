@@ -7,7 +7,7 @@ const categorySchema = mongoose.Schema(
       required: true,
       unique: true
     },
-    description: String
+    description: { type: String }
   },
   { versionKey: false, timestamps: true }
 )
