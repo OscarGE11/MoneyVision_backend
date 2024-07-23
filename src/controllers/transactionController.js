@@ -1,5 +1,7 @@
 import { TransactionModel } from '../models/Transactions.js'
+import { CategoryModel } from '../models/Category.js'
 import { transactionSchema as transactionValidationSchema } from '../validations/transactionValidationSchema.js'
+import { UserModel } from '../models/User.js'
 
 // Function for creating a Transaction
 export const createTransaction = async (req, res) => {
@@ -12,10 +14,25 @@ export const createTransaction = async (req, res) => {
     })
   }
 
+  // Check if category exists
+  const category = await CategoryModel.findById(value.category)
+  if (!category) {
+    return res.status(404).json({ message: 'Category not found' })
+  }
+
+  // Check if user exists
+  const user = await UserModel.findById(value.user)
+  if (!user) {
+    return res.status(404).json({ message: 'User not found' })
+  }
+
   try {
     const newTransaction = new TransactionModel(value)
+    const savedTransaction = await newTransaction.save()
 
-    await newTransaction.save()
+    user.transactions.push(savedTransaction._id) // Add transaction to user 
+    await user.save()
+
     res.status(201).json(newTransaction)
   } catch (error) {
     // 11000 = MongoDB error if unique key value is duplicated
@@ -30,10 +47,9 @@ export const createTransaction = async (req, res) => {
 // Function for getting all the Transactions
 export const getAllTransactions = async (req, res) => {
   try {
-    const transactions = await TransactionModel.find().populate(
-      'category',
-      'name'
-    )
+    const transactions = await TransactionModel.find()
+      .populate('category', 'name')
+      .populate('user', 'name')
     res.status(200).json(transactions)
   } catch (error) {
     res.status(500).json({ message: 'Error getting the transactions' })
@@ -43,10 +59,9 @@ export const getAllTransactions = async (req, res) => {
 // Function for getting one Transaction
 export const getTransactionByID = async (req, res) => {
   try {
-    const transaction = await TransactionModel.findById(req.params.id).populate(
-      'category',
-      'name'
-    )
+    const transaction = await TransactionModel.findById(req.params.id)
+      .populate('category', 'name')
+      .populate('user', 'name')
 
     if (!transaction) {
       return res.status(404).json({
@@ -68,6 +83,18 @@ export const updateTransaction = async (req, res) => {
       message: 'Validation error',
       error: error.details.map((detail) => detail.message)
     })
+  }
+
+  // Check if category exists
+  const category = await CategoryModel.findById(value.category)
+  if (!category) {
+    return res.status(404).json({ message: 'Category not found' })
+  }
+
+  // Check if user exists
+  const user = await UserModel.findById(value.user)
+  if (!user) {
+    return res.status(404).json({ message: 'User not found' })
   }
 
   try {

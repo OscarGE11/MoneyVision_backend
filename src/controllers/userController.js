@@ -36,7 +36,13 @@ export const createUser = async (req, res) => {
 // Get all users
 export const getUsers = async (req, res) => {
   try {
-    const users = await UserModel.find().populate('transactions', 'title')
+    const users = await UserModel.find().populate({
+      path: 'transactions',
+      populate: {
+        path: 'category',
+        select: 'name'
+      }
+    })
     res.status(200).json(users)
   } catch (error) {
     res.status(500).json({ message: 'Error getting all users' })

@@ -19,6 +19,10 @@ const transactionSchema = new mongoose.Schema(
       enum: TYPE_OF_TRANSACTION_ENUM,
       required: true
     },
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: 'User'
+    },
     category: {
       type: Schema.Types.ObjectId,
       ref: 'Category'
