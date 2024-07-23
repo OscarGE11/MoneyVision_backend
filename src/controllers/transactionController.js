@@ -1,4 +1,5 @@
 import { TransactionModel } from '../models/Transactions.js'
+import { CategoryModel } from '../models/Category.js'
 import { transactionSchema as transactionValidationSchema } from '../validations/transactionValidationSchema.js'
 import { UserModel } from '../models/User.js'
 
@@ -13,19 +14,24 @@ export const createTransaction = async (req, res) => {
     })
   }
 
+  // Check if category exists
+  const category = await CategoryModel.findById(value.category)
+  if (!category) {
+    return res.status(404).json({ message: 'Category not found' })
+  }
+
+  // Check if user exists
+  const user = await UserModel.findById(value.user)
+  if (!user) {
+    return res.status(404).json({ message: 'User not found' })
+  }
+
   try {
     const newTransaction = new TransactionModel(value)
-
     const savedTransaction = await newTransaction.save()
 
-    // Look for the user which is the owner of the transaction
-    const user = await UserModel.findById(value.user)
-
-    // If exists, add the transaction to the user's transactions array
-    if (user) {
-      user.transactions.push(savedTransaction._id)
-      await user.save()
-    }
+    user.transactions.push(savedTransaction._id) // Add transaction to user 
+    await user.save()
 
     res.status(201).json(newTransaction)
   } catch (error) {
@@ -77,6 +83,18 @@ export const updateTransaction = async (req, res) => {
       message: 'Validation error',
       error: error.details.map((detail) => detail.message)
     })
+  }
+
+  // Check if category exists
+  const category = await CategoryModel.findById(value.category)
+  if (!category) {
+    return res.status(404).json({ message: 'Category not found' })
+  }
+
+  // Check if user exists
+  const user = await UserModel.findById(value.user)
+  if (!user) {
+    return res.status(404).json({ message: 'User not found' })
   }
 
   try {
