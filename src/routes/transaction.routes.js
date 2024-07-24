@@ -6,13 +6,14 @@ import {
   getTransactionByID,
   updateTransaction
 } from '../controllers/transactionController.js'
+import { authMiddleware } from '../middlewares/authMiddleware.js'
 
 const transactionRouter = Router()
 
-transactionRouter.post('/', createTransaction)
-transactionRouter.get('/', getAllTransactions)
-transactionRouter.get('/:id', getTransactionByID)
-transactionRouter.put('/:id', updateTransaction)
-transactionRouter.delete('/:id', deleteTransaction)
+transactionRouter.post('/', authMiddleware, createTransaction)
+transactionRouter.get('/', authMiddleware, getAllTransactions)
+transactionRouter.get('/:id', authMiddleware, getTransactionByID)
+transactionRouter.put('/:id', authMiddleware, updateTransaction)
+transactionRouter.delete('/:id', authMiddleware, deleteTransaction)
 
 export default transactionRouter

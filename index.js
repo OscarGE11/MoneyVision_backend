@@ -5,6 +5,7 @@ import transactionRouter from './src/routes/transaction.routes.js'
 import morgan from 'morgan'
 import userRouter from './src/routes/user.routes.js'
 import categoryRouter from './src/routes/category.routes.js'
+import cookieParser from 'cookie-parser'
 
 const app = express()
 const PORT = config.port
@@ -12,6 +13,7 @@ const PORT = config.port
 // Middlewares
 app.use(express.json()) // Parsear JSON
 app.use(morgan('dev')) // Rastrear las peticiones HTTP
+app.use(cookieParser())
 
 // Conectar a la base de datos
 connectDB()
