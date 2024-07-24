@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken'
 import config from '../config/config.js'
 
 // Create new user
-export const createUser = async (req, res) => {
+export const register = async (req, res) => {
   const { error, value } = userValidationschema.validate(req.body)
 
   if (error) {
@@ -26,13 +26,8 @@ export const createUser = async (req, res) => {
     // Generate token
     const token = jwt.sign({ id: newUser.id }, config.jwtSecret)
 
-    // Send token in a cookie
     res
-      .cookie('token', token, { httpOnly: true })
-      .status(201)
-      .json({ user: newUser })
-
-    res
+      .cookie(config.accessToken, token, { httpOnly: true, sameSite: 'strict' })
       .status(201)
       .json({ message: 'User created Succesfully', username: newUser.username })
   } catch (error) {
@@ -44,6 +39,7 @@ export const createUser = async (req, res) => {
     res.status(500).json({ message: 'Error creating the user' })
   }
 }
+
 // Login user
 export const login = async (req, res) => {
   const { email, password } = req.body
@@ -52,7 +48,7 @@ export const login = async (req, res) => {
     const user = await UserModel.findOne({ email })
 
     if (!user) {
-      return res.status(400).json({ message: 'Email is wrong' })
+      return res.status(400).json({ message: 'Email not found' })
     }
 
     const validPassword = await bcrypt.compare(password, user.password)
@@ -60,19 +56,24 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: 'Password is incorrect' })
     }
 
+    // Generate token
     const token = jwt.sign({ id: user.id }, config.jwtSecret)
 
     // Send token in a cookie
-    res.cookie('token', token, { httpOnly: true }).json({ user })
+    res
+      .cookie(config.accessToken, token, { httpOnly: true, sameSite: 'strict' })
+      .status(200)
+      .json({ user })
   } catch (error) {
     res.status(500).json({ message: 'Error loggin in' })
   }
 }
 
 export const logout = (req, res) => {
-  res.clearCookie('token')
+  res.clearCookie(config.accessToken)
   res.status(200).json({ message: 'Logged out successfully' })
 }
+
 // Get all users
 export const getUsers = async (req, res) => {
   try {
@@ -152,7 +153,10 @@ export const deleteUser = async (req, res) => {
       res.status(404).json({ message: 'User not found' })
     }
 
-    res.status(204).json({ message: 'User deleted' })
+    res
+      .clearCookie(config.accessToken)
+      .status(204)
+      .json({ message: 'User deleted succesfully' })
   } catch (error) {
     res.status(500).json({ message: 'Error deleting the user' })
   }

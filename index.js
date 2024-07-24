@@ -6,6 +6,8 @@ import morgan from 'morgan'
 import userRouter from './src/routes/user.routes.js'
 import categoryRouter from './src/routes/category.routes.js'
 import cookieParser from 'cookie-parser'
+import { register, login, logout } from './src/controllers/userController.js'
+import { authMiddleware } from './src/middlewares/authMiddleware.js'
 
 const app = express()
 const PORT = config.port
@@ -19,9 +21,12 @@ app.use(cookieParser())
 connectDB()
 
 // Routes
-app.use('/api/users', userRouter)
-app.use('/api/transactions', transactionRouter)
-app.use('/api/categories', categoryRouter)
+app.post('/register', register) // Create new user
+app.post('/login', login) // Log in
+app.post('/logout', logout) // Log out
+app.use('/api/users', authMiddleware, userRouter)
+app.use('/api/transactions', authMiddleware, transactionRouter)
+app.use('/api/categories', authMiddleware, categoryRouter)
 
 // Middleware para manejar errores
 app.use((err, req, res, next) => {
