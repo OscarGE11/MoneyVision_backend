@@ -6,13 +6,14 @@ import {
   getCategoryById,
   updateCategory
 } from '../controllers/categoryController.js'
+import { authMiddleware } from '../middlewares/authMiddleware.js'
 
 const router = Router()
 
-router.post('/', createCategory)
-router.get('/', getAllCategories)
-router.get('/:id', getCategoryById)
-router.delete('/:id', deleteCategory)
-router.put('/:id', updateCategory)
+router.post('/', authMiddleware, createCategory)
+router.get('/', authMiddleware, getAllCategories)
+router.get('/:id', authMiddleware, getCategoryById)
+router.delete('/:id', authMiddleware, deleteCategory)
+router.put('/:id', authMiddleware, updateCategory)
 
 export default router

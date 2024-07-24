@@ -1,6 +1,8 @@
 import { UserModel } from '../models/User.js'
 import { userSchema as userValidationschema } from '../validations/userValidationSchema.js'
 import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken'
+import config from '../config/config.js'
 
 // Create new user
 export const createUser = async (req, res) => {
@@ -20,6 +22,16 @@ export const createUser = async (req, res) => {
 
     const newUser = new UserModel(value)
     await newUser.save()
+
+    // Generate token
+    const token = jwt.sign({ id: newUser.id }, config.jwtSecret)
+
+    // Send token in a cookie
+    res
+      .cookie('token', token, { httpOnly: true })
+      .status(201)
+      .json({ user: newUser })
+
     res
       .status(201)
       .json({ message: 'User created Succesfully', username: newUser.username })
@@ -32,7 +44,35 @@ export const createUser = async (req, res) => {
     res.status(500).json({ message: 'Error creating the user' })
   }
 }
+// Login user
+export const login = async (req, res) => {
+  const { email, password } = req.body
 
+  try {
+    const user = await UserModel.findOne({ email })
+
+    if (!user) {
+      return res.status(400).json({ message: 'Email is wrong' })
+    }
+
+    const validPassword = await bcrypt.compare(password, user.password)
+    if (!validPassword) {
+      return res.status(400).json({ message: 'Password is incorrect' })
+    }
+
+    const token = jwt.sign({ id: user.id }, config.jwtSecret)
+
+    // Send token in a cookie
+    res.cookie('token', token, { httpOnly: true }).json({ user })
+  } catch (error) {
+    res.status(500).json({ message: 'Error loggin in' })
+  }
+}
+
+export const logout = (req, res) => {
+  res.clearCookie('token')
+  res.status(200).json({ message: 'Logged out successfully' })
+}
 // Get all users
 export const getUsers = async (req, res) => {
   try {
