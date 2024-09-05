@@ -57,11 +57,19 @@ export const login = async (req, res) => {
     }
 
     // Generate token
-    const token = jwt.sign({ id: user.id }, config.jwtSecret)
+    const token = jwt.sign({ id: user.id }, config.jwtSecret, {
+      expiresIn: '1h'
+    })
 
     // Send token in a cookie
+
     res
-      .cookie(config.accessToken, token, { httpOnly: true, sameSite: 'strict' })
+      .cookie(config.accessToken, token, {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'Strict',
+        path: '/'
+      })
       .status(200)
       .json({ user })
   } catch (error) {

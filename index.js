@@ -8,9 +8,16 @@ import categoryRouter from './src/routes/category.routes.js'
 import cookieParser from 'cookie-parser'
 import { register, login, logout } from './src/controllers/userController.js'
 import { authMiddleware } from './src/middlewares/authMiddleware.js'
+import cors from 'cors'
 
 const app = express()
 const PORT = config.port
+// Configurar CORS
+const corsOptions = {
+  origin: 'http://localhost:5173',
+  credentials: true
+}
+app.use(cors(corsOptions))
 
 // Middlewares
 app.use(express.json()) // Parsear JSON
