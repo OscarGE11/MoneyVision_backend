@@ -12,14 +12,15 @@ import cors from 'cors'
 
 const app = express()
 const PORT = config.port
+
 // Configurar CORS
 const corsOptions = {
-  origin: 'http://localhost:5173',
+  origin: config.frontendURL,
   credentials: true
 }
-app.use(cors(corsOptions))
 
 // Middlewares
+app.use(cors(corsOptions))
 app.use(express.json()) // Parsear JSON
 app.use(morgan('dev')) // Rastrear las peticiones HTTP
 app.use(cookieParser())
