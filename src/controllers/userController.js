@@ -61,19 +61,17 @@ export const login = async (req, res) => {
       expiresIn: '1h'
     })
 
-    // Send token in a cookie
-
     res
       .cookie(config.accessToken, token, {
         httpOnly: true,
-        secure: false,
+        secure: process.env.NODE_ENV === 'production',
         sameSite: 'Strict',
         path: '/'
       })
       .status(200)
-      .json({ user })
+      .json({ token, user: { username: user.username, email: user.email } })
   } catch (error) {
-    res.status(500).json({ message: 'Error loggin in' })
+    res.status(500).json({ message: 'Error logging in' })
   }
 }
 
