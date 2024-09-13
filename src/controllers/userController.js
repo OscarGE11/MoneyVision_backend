@@ -61,6 +61,7 @@ export const login = async (req, res) => {
       expiresIn: '1h'
     })
 
+    // Send token in a cookie
     res
       .cookie(config.accessToken, token, {
         httpOnly: true,
