@@ -13,17 +13,16 @@ import cors from 'cors'
 const app = express()
 const PORT = config.port
 
-// Configurar CORS
-const corsOptions = {
-  origin: config.frontendURL,
-  credentials: true
-}
-
 // Middlewares
-app.use(cors(corsOptions))
+app.use(cookieParser())
+app.use(
+  cors({
+    origin: config.frontendURL,
+    credentials: true
+  })
+)
 app.use(express.json()) // Parsear JSON
 app.use(morgan('dev')) // Rastrear las peticiones HTTP
-app.use(cookieParser())
 
 // Conectar a la base de datos
 connectDB()

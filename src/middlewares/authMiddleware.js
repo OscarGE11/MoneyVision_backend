@@ -4,6 +4,10 @@ import config from '../config/config.js'
 export const authMiddleware = (req, res, next) => {
   const token = req.cookies.access_token
 
+  console.log('first')
+
+  console.log(token)
+
   if (!token) return res.status(401).json({ message: 'Access denied' })
 
   try {
