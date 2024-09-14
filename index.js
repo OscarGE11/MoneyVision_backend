@@ -13,24 +13,27 @@ import cors from 'cors'
 const app = express()
 const PORT = config.port
 
+const corsOptions = {
+  origin: config.frontendURL,
+  credentials: true
+}
+
 // Middlewares
 app.use(cookieParser())
-app.use(
-  cors({
-    origin: config.frontendURL,
-    credentials: true
-  })
-)
-app.use(express.json()) // Parsear JSON
+app.use(cors(corsOptions))
+app.use(express.json())
 app.use(morgan('dev')) // Rastrear las peticiones HTTP
 
 // Conectar a la base de datos
 connectDB()
 
 // Routes
-app.post('/register', register) // Create new user
-app.post('/login', login) // Log in
-app.post('/logout', logout) // Log out
+app.post('/register', register)
+app.post('/login', login)
+app.post('/logout', logout)
+app.get('/auth/verify', authMiddleware, (req, res) => {
+  res.status(200).json({ authenticated: true })
+})
 app.use('/api/users', authMiddleware, userRouter)
 app.use('/api/transactions', authMiddleware, transactionRouter)
 app.use('/api/categories', authMiddleware, categoryRouter)

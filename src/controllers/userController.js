@@ -65,12 +65,12 @@ export const login = async (req, res) => {
     res
       .cookie('access_token', token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'Strict',
+        secure: true,
+        sameSite: process.env.NODE_ENV === 'production' ? 'Strict' : 'None',
         path: '/'
       })
       .status(200)
-      .json({ token, user: { username: user.username, email: user.email } })
+      .json({ user: { username: user.username, email: user.email } })
   } catch (error) {
     res.status(500).json({ message: 'Error logging in' })
   }
