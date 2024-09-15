@@ -34,9 +34,9 @@ app.post('/logout', logout)
 app.get('/auth/verify', authMiddleware, (req, res) => {
   res.status(200).json({ authenticated: true })
 })
-app.use('/api/users', authMiddleware, userRouter)
-app.use('/api/transactions', authMiddleware, transactionRouter)
-app.use('/api/categories', authMiddleware, categoryRouter)
+app.use('/api/users', userRouter)
+app.use('/api/transactions', transactionRouter)
+app.use('/api/categories', categoryRouter)
 
 // Middleware para manejar errores
 app.use((err, req, res, next) => {
