@@ -27,16 +27,22 @@ export const register = async (req, res) => {
     const token = jwt.sign({ id: newUser.id }, config.jwtSecret)
 
     res
-      .cookie(config.accessToken, token, { httpOnly: true, sameSite: 'strict' })
+      .cookie('access_token', token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: process.env.NODE_ENV === 'production' ? 'Strict' : 'None',
+        path: '/'
+      })
       .status(201)
       .json({ message: 'User created Succesfully', username: newUser.username })
   } catch (error) {
     // 11000 = MongoDB error if unique key value is duplicated
     if (error.code === 11000) {
       const duplicatedKey = Object.keys(error.keyValue)[0]
-      res.status(409).json({ message: `${duplicatedKey} already exists` })
+      res.status(409).json({ error: `${duplicatedKey} already exists` })
+    } else {
+      res.status(500).json({ error: 'Error creating the user' })
     }
-    res.status(500).json({ message: 'Error creating the user' })
   }
 }
 
@@ -48,24 +54,31 @@ export const login = async (req, res) => {
     const user = await UserModel.findOne({ email })
 
     if (!user) {
-      return res.status(400).json({ message: 'Email not found' })
+      return res.status(400).json({ error: 'Email not found' })
     }
 
     const validPassword = await bcrypt.compare(password, user.password)
     if (!validPassword) {
-      return res.status(400).json({ message: 'Password is incorrect' })
+      return res.status(400).json({ error: 'Password is incorrect' })
     }
 
     // Generate token
-    const token = jwt.sign({ id: user.id }, config.jwtSecret)
+    const token = jwt.sign({ id: user.id }, config.jwtSecret, {
+      expiresIn: '1h'
+    })
 
     // Send token in a cookie
     res
-      .cookie(config.accessToken, token, { httpOnly: true, sameSite: 'strict' })
+      .cookie('access_token', token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: process.env.NODE_ENV === 'production' ? 'Strict' : 'None',
+        path: '/'
+      })
       .status(200)
-      .json({ user })
+      .json({ user: { username: user.username, email: user.email } })
   } catch (error) {
-    res.status(500).json({ message: 'Error loggin in' })
+    res.status(500).json({ error: 'Error logging in' })
   }
 }
 
@@ -86,7 +99,7 @@ export const getUsers = async (req, res) => {
     })
     res.status(200).json(users)
   } catch (error) {
-    res.status(500).json({ message: 'Error getting all users' })
+    res.status(500).json({ error: 'Error getting all users' })
   }
 }
 
@@ -102,12 +115,12 @@ export const getUserById = async (req, res) => {
     })
 
     if (!user) {
-      return res.status(404).json({ message: 'User not found' })
+      return res.status(404).json({ error: 'User not found' })
     }
 
     res.status(200).json(user)
   } catch (error) {
-    res.status(500).json({ message: 'Error getting the user' })
+    res.status(500).json({ error: 'Error getting the user' })
   }
 }
 
@@ -132,7 +145,7 @@ export const updateUser = async (req, res) => {
     )
 
     if (!updatedUser) {
-      res.status(404).json({ message: 'User not found' })
+      res.status(404).json({ error: 'User not found' })
     }
 
     res.status(202).json({
@@ -140,7 +153,7 @@ export const updateUser = async (req, res) => {
       username: updatedUser.username
     })
   } catch (error) {
-    res.status(500).json({ message: 'Error updating the user' })
+    res.status(500).json({ error: 'Error updating the user' })
   }
 }
 
@@ -150,7 +163,7 @@ export const deleteUser = async (req, res) => {
     const deletedUser = await UserModel.findByIdAndDelete(req.params.id)
 
     if (!deletedUser) {
-      res.status(404).json({ message: 'User not found' })
+      res.status(404).json({ error: 'User not found' })
     }
 
     res
@@ -158,6 +171,6 @@ export const deleteUser = async (req, res) => {
       .status(204)
       .json({ message: 'User deleted succesfully' })
   } catch (error) {
-    res.status(500).json({ message: 'Error deleting the user' })
+    res.status(500).json({ error: 'Error deleting the user' })
   }
 }
