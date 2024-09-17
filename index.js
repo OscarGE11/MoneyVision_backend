@@ -6,12 +6,7 @@ import morgan from 'morgan'
 import userRouter from './src/routes/user.routes.js'
 import categoryRouter from './src/routes/category.routes.js'
 import cookieParser from 'cookie-parser'
-import {
-  register,
-  login,
-  logout,
-  getUserById
-} from './src/controllers/userController.js'
+import { register, login, logout } from './src/controllers/userController.js'
 import { authMiddleware } from './src/middlewares/authMiddleware.js'
 import cors from 'cors'
 
@@ -37,7 +32,6 @@ app.post('/register', register)
 app.post('/login', login)
 app.post('/logout', logout)
 app.get('/auth/verify', authMiddleware, (req, res) => {
-  console.log(res)
   res.status(200).json({ authenticated: true, userId: req.user.id })
 })
 app.use('/api/users', userRouter)

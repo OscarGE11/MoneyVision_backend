@@ -10,7 +10,6 @@ export const authMiddleware = (req, res, next) => {
     if (err) return res.status(403).json({ message: 'Token is invalid' })
 
     req.user = decoded
-    const userId = req.user.id
     next()
   })
 }
