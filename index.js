@@ -32,7 +32,7 @@ app.post('/register', register)
 app.post('/login', login)
 app.post('/logout', logout)
 app.get('/auth/verify', authMiddleware, (req, res) => {
-  res.status(200).json({ authenticated: true })
+  res.status(200).json({ authenticated: true, userId: req.user.id })
 })
 app.use('/api/users', userRouter)
 app.use('/api/transactions', transactionRouter)
