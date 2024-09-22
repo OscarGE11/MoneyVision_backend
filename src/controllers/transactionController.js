@@ -17,13 +17,13 @@ export const createTransaction = async (req, res) => {
   // Check if category exists
   const category = await CategoryModel.findById(value.category)
   if (!category) {
-    return res.status(404).json({ message: 'Category not found' })
+    return res.status(404).json({ error: 'Category not found' })
   }
 
   // Check if user exists
   const user = await UserModel.findById(value.user)
   if (!user) {
-    return res.status(404).json({ message: 'User not found' })
+    return res.status(404).json({ error: 'User not found' })
   }
 
   try {
@@ -38,9 +38,9 @@ export const createTransaction = async (req, res) => {
     // 11000 = MongoDB error if unique key value is duplicated
     if (error.code === 11000) {
       const duplicatedKey = Object.keys(error.keyValue)[0]
-      res.status(409).json({ message: `${duplicatedKey} already exists` })
+      res.status(409).json({ error: `${duplicatedKey} already exists` })
     }
-    res.status(500).json({ message: 'Error creating the Transaction' })
+    res.status(500).json({ error: 'Error creating the Transaction' })
   }
 }
 
@@ -52,7 +52,7 @@ export const getAllTransactions = async (req, res) => {
       .populate('user', 'name')
     res.status(200).json(transactions)
   } catch (error) {
-    res.status(500).json({ message: 'Error getting the transactions' })
+    res.status(500).json({ error: 'Error getting the transactions' })
   }
 }
 
@@ -65,12 +65,12 @@ export const getTransactionByID = async (req, res) => {
 
     if (!transaction) {
       return res.status(404).json({
-        message: 'Transaction not found'
+        error: 'Transaction not found'
       })
     }
     res.status(200).json(transaction)
   } catch (error) {
-    res.status(500).json({ message: 'Error getting the transaction' })
+    res.status(500).json({ error: 'Error getting the transaction' })
   }
 }
 
@@ -88,13 +88,13 @@ export const updateTransaction = async (req, res) => {
   // Check if category exists
   const category = await CategoryModel.findById(value.category)
   if (!category) {
-    return res.status(404).json({ message: 'Category not found' })
+    return res.status(404).json({ error: 'Category not found' })
   }
 
   // Check if user exists
   const user = await UserModel.findById(value.user)
   if (!user) {
-    return res.status(404).json({ message: 'User not found' })
+    return res.status(404).json({ error: 'User not found' })
   }
 
   try {
@@ -106,11 +106,11 @@ export const updateTransaction = async (req, res) => {
       }
     )
     if (!updatedTransaction) {
-      res.status(404).json({ message: 'Transaction not found' })
+      res.status(404).json({ error: 'Transaction not found' })
     }
     res.status(202).json(updatedTransaction)
   } catch (error) {
-    res.status(500).json({ message: 'Error updating the transaction' })
+    res.status(500).json({ error: 'Error updating the transaction' })
   }
 }
 
@@ -122,11 +122,11 @@ export const deleteTransaction = async (req, res) => {
     )
 
     if (!deletedTransaction) {
-      return res.status(404).json({ message: 'Transaction not found' })
+      return res.status(404).json({ error: 'Transaction not found' })
     }
 
-    res.status(204).json({ message: 'Transaction deleted' })
+    res.status(204).json({ error: 'Transaction deleted' })
   } catch (error) {
-    res.status(500).json({ message: 'Error deleting the transaction' })
+    res.status(500).json({ error: 'Error deleting the transaction' })
   }
 }
