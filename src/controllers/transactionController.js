@@ -2,6 +2,7 @@ import { TransactionModel } from '../models/Transactions.js'
 import { CategoryModel } from '../models/Category.js'
 import { transactionSchema as transactionValidationSchema } from '../validations/transactionValidationSchema.js'
 import { UserModel } from '../models/User.js'
+import { TYPE_OF_TRANSACTION_ENUM } from '../utils/ENUMS.js'
 
 // Function for creating a Transaction
 export const createTransaction = async (req, res) => {
@@ -29,6 +30,12 @@ export const createTransaction = async (req, res) => {
   try {
     const newTransaction = new TransactionModel(value)
     const savedTransaction = await newTransaction.save()
+
+    if (value.typeOfTransaction === TYPE_OF_TRANSACTION_ENUM[1]) {
+      user.money -= value.amount
+    } else if (value.typeOfTransaction === TYPE_OF_TRANSACTION_ENUM[0]) {
+      user.money += value.amount
+    }
 
     user.transactions.push(savedTransaction._id) // Add transaction to user
     await user.save()
@@ -98,6 +105,19 @@ export const updateTransaction = async (req, res) => {
   }
 
   try {
+    const existingTransaction = await TransactionModel.findById(req.params.id)
+    if (!existingTransaction) {
+      return res.status(404).json({ message: 'Transaction not found' })
+    }
+
+    if (existingTransaction.typeOfTransaction === TYPE_OF_TRANSACTION_ENUM[1]) {
+      user.money += existingTransaction.amount
+    } else if (
+      existingTransaction.typeOfTransaction === TYPE_OF_TRANSACTION_ENUM[0]
+    ) {
+      user.money -= existingTransaction.amount
+    }
+
     const updatedTransaction = await TransactionModel.findByIdAndUpdate(
       req.params.id,
       value,
@@ -105,9 +125,15 @@ export const updateTransaction = async (req, res) => {
         new: true
       }
     )
-    if (!updatedTransaction) {
-      res.status(404).json({ message: 'Transaction not found' })
+
+    if (updateTransaction.typeOfTransaction === TYPE_OF_TRANSACTION_ENUM[1]) {
+      user.money -= updateTransaction.amount
+    } else if (
+      updateTransaction.typeOfTransaction === TYPE_OF_TRANSACTION_ENUM[0]
+    ) {
+      user.money += updateTransaction.amount
     }
+    await user.save()
     res.status(202).json(updatedTransaction)
   } catch (error) {
     res.status(500).json({ message: 'Error updating the transaction' })
