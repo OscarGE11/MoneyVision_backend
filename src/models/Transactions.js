@@ -3,12 +3,9 @@ import { TYPE_OF_TRANSACTION_ENUM } from '../utils/ENUMS.js'
 
 const transactionSchema = new mongoose.Schema(
   {
-    title: {
+    description: {
       type: String,
       required: true
-    },
-    description: {
-      type: String
     },
     amount: {
       type: Number,

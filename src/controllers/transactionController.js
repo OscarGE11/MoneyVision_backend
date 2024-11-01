@@ -40,7 +40,12 @@ export const createTransaction = async (req, res) => {
     user.transactions.push(savedTransaction._id) // Add transaction to user
     await user.save()
 
-    res.status(201).json(newTransaction)
+    // Populate category to receive the full object instead of the category ID
+    const populatedTransaction = await TransactionModel.findById(
+      savedTransaction._id
+    ).populate('category')
+
+    res.status(201).json(populatedTransaction)
   } catch (error) {
     // 11000 = MongoDB error if unique key value is duplicated
     if (error.code === 11000) {

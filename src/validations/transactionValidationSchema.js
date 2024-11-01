@@ -2,15 +2,12 @@ import Joi from 'joi'
 import { TYPE_OF_TRANSACTION_ENUM } from '../utils/ENUMS.js'
 
 export const transactionSchema = Joi.object({
-  title: Joi.string().min(3).max(50).required().messages({
-    'string.base': 'Title should be a type of text',
-    'string.empty': 'Title cannot be empty',
-    'string.min': 'Title should have a minimum length of 3 characters',
-    'string.max': 'Title should have a maximum length of 50 characters',
-    'any.required': 'Title is required'
-  }),
-  description: Joi.string().allow('').optional().messages({
-    'string.base': 'Description should be a type of text'
+  description: Joi.string().allow('').optional().required().messages({
+    'any.required': 'Description is required',
+    'string.base': 'Description should be a type of text',
+    'string.empty': 'Description cannot be empty',
+    'string.min': 'Description should have a minimum length of 3 characters',
+    'string.max': 'Description should have a maximum length of 50 characters'
   }),
   amount: Joi.number().positive().required().messages({
     'number.base': 'Amount should be a type of number',
