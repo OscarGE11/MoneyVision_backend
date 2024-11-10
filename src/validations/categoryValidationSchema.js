@@ -10,5 +10,10 @@ export const categorySchema = Joi.object({
   }),
   description: Joi.string().allow('').optional().messages({
     'string.base': 'Description should be a type of text'
+  }),
+  color: Joi.string().allow('').required().messages({
+    'string.base': 'Color should be a type of text',
+    'any.required': 'Color is required',
+    'string.empty': 'Color cannot be empty'
   })
 }).strict()
