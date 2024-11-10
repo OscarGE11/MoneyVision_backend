@@ -7,7 +7,8 @@ const categorySchema = mongoose.Schema(
       required: true,
       unique: true
     },
-    description: { type: String }
+    description: { type: String },
+    color: { type: String }
   },
   { versionKey: false, timestamps: true }
 )
